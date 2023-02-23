@@ -7,9 +7,13 @@ output: html_document
 
 An introduction of the data and a description of the trends/books/items you are choosing to analyze (and why!)
 
+The data is collected by the Seattle Public Library to display the trends of items checked out at least 10 times a month from 2017 to 2023. I choose to analyze the relationship between the changes of the number of checkouts and the type of items checked out, the changes of the number of checkouts in two different books, and which month has the most number of checkouts. This analysis is to find out the trends of items checked out in library to help the library organize their checkout systems. 
+
 ### Summary Information
 
 Write a summary paragraph of findings that includes the 5 values calculated from your summary information R script
+
+The first two calculations are the averages of the number of checkouts in 2017 and 2023. We can use these values to compare the changes of the number of checkouts between 2017 and 2023. The The next two calculations are the year with most checkouts of two different material types, which indicate that people prefer to check out more than books comparing now and 5 years ago. The last value is about the number of checkouts of the book I am interested in ("Among Others"). It was really popular in 2018.
 
 These will likely be calculated using your DPLYR skills, answering questions such as:
 
@@ -23,16 +27,29 @@ Feel free to calculate and report values that you find relevant.
 ### The Dataset
 
 - Who collected/published the data?  
+The Seattle Public Library collected/published the data.
+
 - What are the parameters of the data (dates, number of checkouts, kinds of books, etc.)?
+UsageClass(item is “physical” or “digital”), CheckoutType(the vendor tool used to check out the item), MaterialType(the type of item checked out), CheckoutYear(the year of checkout), CheckoutMonth(the month of checkout), Checkouts(the number of checkouts), Title(the title of the checkout book), ISBN, Creator, Subjects, Publisher, PublicationYear.
+
 - How was the data collected or generated?  
+Checkout information is gathered from a variety of recent and old sources. The media suppliers Overdrive, hoopla, Freegal, and RBDigital give usage information for digital items. The Legrady artwork data archives are the source of this information for historical physical item checkouts between April 2005 and September 30, 2016. The Horizon ILS has been as the source for data since October 1, 2016.
+
 - Why was the data collected?  
+In libraries, information on checkouts is gathered to monitor book popularity and circulation, to examine reading behavior trends, to design programs and events, and to assess the efficiency of library services.
+
 - What, if any, ethical questions do you need to consider when working with this data?  
+The information on individual book checkouts might be used to identify people or divulge personal information, raising privacy issues.
+
 - What are possible limitations or problems with this data?   (at least 200 words)
 
+First of all, the data might be skewed toward certain book genres or readers, such as those who borrow just books in a particular category or go to the library more frequently. It is helpful for people to analyze the data if the library can collect the specific time when does people checkout. Based on this data, we can conclude when does people prefer to go to the library to pick books they want. Furthermore, the information in the data is completely devoid of context and details on the motives behind the checkouts, such as whether they were for pleasure or academic pursuits. Seasonality, holidays, and other special occasions, which can modify reader behavior and reading habits, may have an impact on the results. As it was mentioned by the Seattle Public Library, the data is renewed every month. In my opinion, it is necessary to collect the data more frequently, like once a week or once in two weeks, which will obtain the data more precisely. Last but not the least, books that were borrowed but never returned as well as lost or damaged books that had to be replaced may not be taken into account in the data. It may be difficult to draw conclusions about the library's overall circulation trends because the data only represent a small portion of the collection as a whole. 
 
 ### First Trends Over Time Chart
 
 Include a chart. Make sure to describe why you included the chart, and what patterns emerged
+
+The purpose of this chart is to find out the changes of the number of checkouts in two books which are "24K Magic" and "Among Others". The graph shows that there is no checkout record of "24K Magic" after 2018, and the number of checkouts of "Among Others" is constant except 2018.
 
 The first chart that you will create and include will show the trend over time of your variable/topic/interest. Think carefully about what you want to communicate to your user (you may have to find relevant trends in the dataset first!). Here are some requirements to help guide your design:
 
@@ -47,12 +64,32 @@ When we say "clear" or "human readable" titles and labels, that means that you s
 
 Here's an example of how to run an R script inside an RMarkdown file:
 
-``````{r, echo = FALSE, warning = FALSE, code = readLines("chart1_example.R")}
+``````{r, echo = FALSE, warning = FALSE, code = readLines("Chart 1.R")}
+library(ggplot2)
+library(dplyr)
+
+twobooks_checkout <- read.csv("~/Desktop/2017-2023-10-Checkouts-SPL-Data.csv")
+
+twobooks <- twobooks_checkout %>%
+  filter(Title %in% c("Among Others", "24K Magic"))
+
+  ggplot(data = twobooks) +
+    geom_line(aes(x = CheckoutYear,
+                y = Checkouts,
+                color = Title)) +
+    labs(
+    title = "The Changes Of Checkouts In Two Books From 2017 To 2023",
+    x = "CheckoutYear",
+    y = "The Number Of Checkouts",
+    color = "Book Name"
+  )
 ```
 
 ### Second Trends Over Time Chart
 
 Include a chart. Make sure to describe why you included the chart, and what patterns emerged
+
+This chart is trying to find out the relationship between the material type and the changes of the number of checkouts. Before 2020, there are more checkouts of book than audiobook and movie, but after 2020 there are less checkout of book than audiobook. It is hard to see the checkout records of movie in the chart.
 
 The second chart that you will create and include will show another trend over time of your variable/topic/interest. Think carefully about what you want to communicate to your user (you may have to find relevant trends in the dataset first!). Here are some requirements to help guide your design:
 
@@ -67,7 +104,24 @@ When we say "clear" or "human readable" titles and labels, that means that you s
 
 Here's an example of how to run an R script inside an RMarkdown file:
 
-``````{r, echo = FALSE, code = readLines("chart2_example.R")}
+``````{r, echo = FALSE, code = readLines("Chart 2.R")}
+library(ggplot2)
+library(dplyr)
+
+three_materialtype_checkout <- read.csv("~/Desktop/2017-2023-10-Checkouts-SPL-Data.csv")
+
+three_materialtype <- three_materialtype_checkout %>%
+  filter(MaterialType %in% c("MOVIE", "BOOK", "AUDIOBOOK"))
+
+ggplot(data = three_materialtype) +
+  geom_col(aes(x = CheckoutYear,
+                y = Checkouts,
+                fill = MaterialType)) +
+  labs(
+    title = "The Changes Of Checkouts In Three MaterialType From 2017 To 2023",
+    x = "CheckoutYear",
+    y = "The Number Of Checkouts"
+  )
 ```
 
 ### Your Choice
@@ -78,9 +132,24 @@ The last chart is up to you. It could be a line plot, scatter plot, histogram, b
 - The chart needs a clear title 
 - You need a legend for your different line colors and a clear legend title
 
+The last chart is find out which month has the most number of checkouts. It is clear in the chart that January has the most number of checkouts. The rest of months have the similar number of checkouts.
+
 Here's an example of how to run an R script inside an RMarkdown file:
 
-``````{r, echo = FALSE, code = readLines("chart2_example.R")}
+``````{r, echo = FALSE, code = readLines("Chart 3.R")}
+library(ggplot2)
+
+most_popular_month_checkout <- read.csv("~/Desktop/2017-2023-10-Checkouts-SPL-Data.csv")
+
+ggplot(data = most_popular_month_checkout) +
+  geom_col(mapping = aes(x = CheckoutMonth,
+               y = Checkouts,
+               fill = CheckoutMonth)) +
+  labs(
+    title = "The Quarter With The Most Number Of Checkouts Between 2017 And 2023",
+    x = "CheckoutMonth",
+    y = "The Number Of Checkouts"
+  )
 ```
 
 
